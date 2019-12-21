@@ -1,12 +1,12 @@
-package com.we2dx.ribytrakks.model
+package com.we2dx.ribytrakks.database
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.we2dx.ribytrakks.database.TrakkData
 
 @Dao
 interface TrakkDao {
     @Query("SELECT * FROM trakks")
-    fun getAllTrakks(): LiveData<List<TrakkDao>>
+    fun getAllTrakks(): List<TrakkData>
 
 
     @Update(onConflict = OnConflictStrategy.REPLACE)

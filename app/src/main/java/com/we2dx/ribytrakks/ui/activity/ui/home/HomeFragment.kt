@@ -1,25 +1,32 @@
 package com.we2dx.ribytrakks.ui.activity.ui.home
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.room.Room
 import com.airbnb.lottie.LottieAnimationView
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.we2dx.ribytrakks.R
 import com.we2dx.ribytrakks.database.AppDatabase
-import com.we2dx.ribytrakks.model.TrakkData
+import com.we2dx.ribytrakks.database.TrakkData
 import com.we2dx.ribytrakks.ui.activity.MainActivity
 import com.we2dx.ribytrakks.ui.activity.TrakkDetails
 import com.we2dx.ribytrakks.utils.FusedLocationManager
@@ -68,7 +75,9 @@ class HomeFragment : Fragment() {
 
         mDb = AppDatabase.getInstance(context)
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(activity as MainActivity )
-        mFusedLocationManager = FusedLocationManager(mFusedLocationClient,context!!,(activity as MainActivity ))
+//        mFusedLocationManager = FusedLocationManager(mFusedLocationClient,context!!,(activity as MainActivity ))
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -103,9 +112,10 @@ class HomeFragment : Fragment() {
 
         end_lat = mEndlocation.latitude.toFloat()
         end_lng = mEndlocation.longitude.toFloat()
+       Toast.makeText(context!!,start_lat.toString() + " " + start_lng.toString(),Toast.LENGTH_LONG).show()
 
-       val trakkData = TrakkData(start_pointLat = start_lat,start_pointLng = start_lng
-                                ,end_pointLat = end_lat, end_pointLng = end_lng)
+       val trakkData = TrakkData(start_pointLat = start_lat!!,start_pointLng = start_lng!!
+                                ,end_pointLat = end_lat!!, end_pointLng = end_lng!!)
        mLastTrakkId.text = trakkData.trakkID.toString()
        mDb.trakkDao().insertTrakk(trakkData)
 
@@ -121,8 +131,8 @@ class HomeFragment : Fragment() {
             mTrakkStarted = true
             mTrakkState.text = "End Trakk"
             mLastTrakkLayout.visibility = View.GONE
-            mFusedLocationManager.getLastLocation()
-            mStartlocation = mFusedLocationManager.getLocation()
+             getLastLocation()
+
 
         }else {
             if (trakkOnGoingAnim.isAnimating)
@@ -132,9 +142,7 @@ class HomeFragment : Fragment() {
             mLastTrakkLayout.visibility = View.VISIBLE
             mTrakkState.text = "Start New Trakk"
             mTrakkStarted = false
-            mFusedLocationManager.getLastLocation()
-            mEndlocation = mFusedLocationManager.getLocation()
-            saveLocationToDb()
+            requestNewLocationData()
 
         }
     }
@@ -143,8 +151,94 @@ class HomeFragment : Fragment() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == PERMISSION_ID) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                mFusedLocationManager.getLastLocation()
+               mStartlocation = mFusedLocationManager.getLastLocation()
             }
         }
     }
+
+
+lateinit var mlocation : Location
+
+@SuppressLint("MissingPermission")
+fun getLastLocation() {
+    if (checkPermissions()) {
+        if (isLocationEnabled()) {
+
+            mFusedLocationClient.lastLocation.addOnCompleteListener(activity as MainActivity) { task ->
+                val location: Location? = task.result
+                if (location == null) {
+                    requestNewLocationData()
+                } else {
+//                    mlocation = location
+                    mStartlocation = location
+
+                    Toast.makeText(context!!,mStartlocation.latitude.toString() + " " + mStartlocation.longitude.toString(),Toast.LENGTH_LONG).show()
+                }
+            }
+        } else {
+            Toast.makeText(context, "Turn on location", Toast.LENGTH_LONG).show()
+            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            context!!.startActivity(intent)
+        }
+    } else {
+        requestPermissions()
+    }
+}
+fun getLocation(): Location {
+    return mlocation
+}
+
+@SuppressLint("MissingPermission")
+private fun requestNewLocationData() {
+    val mLocationRequest = LocationRequest()
+    mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+    mLocationRequest.interval = 0
+    mLocationRequest.fastestInterval = 0
+    mLocationRequest.numUpdates = 1
+
+    mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context!!)
+    mFusedLocationClient.requestLocationUpdates(
+        mLocationRequest, mLocationCallback,
+        Looper.myLooper()
+    )
+}
+
+private val mLocationCallback = object : LocationCallback()  {
+    override fun onLocationResult(locationResult: LocationResult) {
+        val mLastLocation: Location = locationResult.lastLocation
+        mEndlocation = mLastLocation
+
+        saveLocationToDb()
+    }
+}
+
+private fun isLocationEnabled(): Boolean {
+    val locationManager: LocationManager = context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+        LocationManager.NETWORK_PROVIDER
+    )
+}
+
+private fun checkPermissions(): Boolean {
+    if (ActivityCompat.checkSelfPermission(
+            context!!,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED &&
+        ActivityCompat.checkSelfPermission(
+            context!!,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+        return true
+    }
+    return false
+}
+
+private fun requestPermissions() {
+    ActivityCompat.requestPermissions(
+        activity as MainActivity,
+        arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
+        PERMISSION_ID
+    )
+}
 }

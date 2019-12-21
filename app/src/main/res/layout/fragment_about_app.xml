@@ -4,58 +4,65 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:padding="@dimen/text_margin"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <ScrollView
         android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:overScrollMode="ifContentScrolls"
+        android:fillViewport="true">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/drCloudPrimaryRed_light"
-            android:textSize="@dimen/_15ssp"
-            android:textStyle="bold"
-            android:layout_margin="@dimen/text_margin"
-            android:text="@string/t_c_header"/>
+        <LinearLayout
+            android:padding="@dimen/text_margin"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_13ssp"
-            android:textStyle="bold"
-            android:layout_marginStart="@dimen/text_margin"
-            android:text="2. DEFINITIONS"/>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/drCloudPrimaryRed_light"
+                android:textSize="@dimen/_15ssp"
+                android:textStyle="bold"
+                android:layout_margin="@dimen/text_margin"
+                android:text="@string/t_c_header"/>
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_13ssp"
-            android:layout_marginStart="@dimen/text_margin"
-            android:layout_marginEnd="@dimen/text_margin"
-            android:layout_marginBottom="@dimen/text_margin"
-            android:text="@string/terms_and_conditions"/>
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_13ssp"
-            android:textStyle="bold"
-            android:layout_marginStart="@dimen/text_margin"
-            android:text="3. PROCESS"/>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_13ssp"
+                android:textStyle="bold"
+                android:layout_marginStart="@dimen/text_margin"
+                android:text="2. DEFINITIONS"/>
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_13ssp"
-            android:layout_marginStart="@dimen/text_margin"
-            android:layout_marginEnd="@dimen/text_margin"
-            android:text="@string/large_text"/>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_13ssp"
+                android:layout_marginStart="@dimen/text_margin"
+                android:layout_marginEnd="@dimen/text_margin"
+                android:layout_marginBottom="@dimen/text_margin"
+                android:text="@string/terms_and_conditions"/>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_13ssp"
+                android:textStyle="bold"
+                android:layout_marginStart="@dimen/text_margin"
+                android:text="3. PROCESS"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_13ssp"
+                android:layout_marginStart="@dimen/text_margin"
+                android:layout_marginEnd="@dimen/text_margin"
+                android:text="@string/large_text"/>
 
 
-    </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
